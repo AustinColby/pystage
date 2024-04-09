@@ -216,6 +216,7 @@ class _SensingSprite(BaseSprite):
     sensing_touchingobject_edge.value="_edge_"
 
     def sensing_touchingobject_sprite(self, sprite):
+        sprite = sprite._core
         if sprite.rect.colliderect(self.rect):
             offset = (self.rect.left - sprite.rect.left, self.rect.top - sprite.rect.top)
             return sprite.mask.overlap(self.mask, offset) is not None
@@ -224,7 +225,21 @@ class _SensingSprite(BaseSprite):
     sensing_touchingobject_sprite.opcode="sensing_touchingobject"
 
     def sensing_touchingcolor(self, color):
-        pass
+        screen_without_myself = self.stage.get_screen_without(self)
+        rect = self.rect
+        # set `step` to 2 to speed up the check
+        for x in range(rect.left, rect.right, 2):
+            for y in range(rect.top, rect.bottom, 2):
+                if self.image.get_at((x - rect.left, y - rect.top)).a == 0:
+                    continue
+                try:
+                    pixel_color = screen_without_myself.get_at((x, y))
+                except IndexError:
+                    continue
+                if pixel_color[:3] == color:
+                    return True
+
+        return False
 
     def sensing_coloristouchingcolor(self, sprite_color, color):
         pass

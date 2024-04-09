@@ -25,6 +25,9 @@ class _Sound(BaseSprite):
 
     def sound_play(self, name, loop=0):
         channel = self.mixer.find_channel()
+
+        if channel is None:
+            return None
         sound = self.sound_manager.get_sound(name)
         if sound is not None:
             channel.play(sound, loop)
@@ -33,7 +36,12 @@ class _Sound(BaseSprite):
     def sound_playuntildone(self, name):
         sound = self.sound_manager.get_sound(name)
         if sound is not None:
-            self.mixer.find_channel().play(sound, 0)
+            channel = self.mixer.find_channel()
+
+            if channel is None:
+                return
+            
+            channel.play(sound, 0)
             # time.sleep(sound.get_length())
             # This need to be done via wait time in code block
             # TODO: Add this function to yield blocks.
